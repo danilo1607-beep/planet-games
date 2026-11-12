@@ -1,1 +1,62 @@
-    <!DOCTYPE html>     <html lang="ru">     <head>     <meta charset="UTF-8">     <meta name="viewport" content="width=device-width, initial-scale=1">     <title>PLANET GAMES</title>     <style>     body {       margin: 0;       background: #111126;       color: white;       font-family: Arial, sans-serif;       text-align: center;     }     header {       padding: 22px;       background: #211a43;       color: #a98bff;       font-size: 28px;       font-weight: bold;     }     p { color: #ccc; }     canvas {       background: #080817;       border: 2px solid #9875ff;       border-radius: 12px;       max-width: 95%;       touch-action: none;     }     button {       background: #8055e8;       color: white;       border: 0;       border-radius: 9px;       padding: 13px 25px;       font-size: 17px;       cursor: pointer;     }     </style>     </head>     <body>     <header>🌍 PLANET GAMES</header>     <h2>🚀 SPACE DODGE</h2>     <p>Управляй кораблём и уворачивайся от метеоритов!</p>     <canvas id="game" width="360" height="480"></canvas>     <p id="score">Очки: 0</p>     <button onclick="start()">Играть заново</button>     <script>     const c = document.getElementById("game");     const ctx = c.getContext("2d");     let player, rocks, score, running, timer;     function start() {       player = 180;       rocks = [];       score = 0;       running = true;       clearInterval(timer);       timer = setInterval(() => {         rocks.push({x: Math.random()*330, y:-25});       }, 750);       draw();     }     function draw() {       if (!running) return;       ctx.clearRect(0,0,360,480);       ctx.fillStyle = "#a98bff";       ctx.fillRect(player-15,420,30,30);       ctx.fillStyle = "#ff6b8a";       for (const r of rocks) {         r.y += 3;         ctx.beginPath();         ctx.arc(r.x,r.y,13,0,Math.PI*2);         ctx.fill();         if (r.y>405 && r.y<455 && Math.abs(r.x-player)<27) {           running=false;           clearInterval(timer);           ctx.fillStyle="white";           ctx.font="28px Arial";           ctx.fillText("GAME OVER",95,230);           return;         }       }       rocks=rocks.filter(r=>r.y<500);       score++;       document.getElementById("score").textContent="Очки: "+score;       requestAnimationFrame(draw);     }     c.addEventListener("mousemove",e=>{       const rect=c.getBoundingClientRect();       player=(e.clientX-rect.left)*360/rect.width;     });     c.addEventListener("touchmove",e=>{       e.preventDefault();       const rect=c.getBoundingClientRect();       player=(e.touches[0].clientX-rect.left)*360/rect.width;     },{passive:false});     start();     </script>     </body>    </html>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PLANET GAMES</title>
+<style>
+body{margin:0;background:#111126;color:white;font-family:Arial;text-align:center}
+header{padding:22px;background:#211a43;color:#a98bff;font-size:30px;font-weight:bold}
+canvas{background:#080817;border:2px solid #9875ff;border-radius:12px;max-width:95%;touch-action:none}
+button{background:#8055e8;color:white;border:0;border-radius:9px;padding:13px 25px;font-size:17px}
+</style>
+</head>
+<body>
+<header>🌍 PLANET GAMES</header>
+<h2>🚀 SPACE DODGE</h2>
+<p>Уворачивайся от метеоритов!</p>
+<canvas id="game" width="360" height="480"></canvas>
+<h3 id="score">Очки: 0</h3>
+<button onclick="start()">Играть заново</button>
+<script>
+const c=document.getElementById("game");
+const ctx=c.getContext("2d");
+let player,rocks,score,running,frame;
+function start(){
+ player=180;rocks=[];score=0;running=true;
+ cancelAnimationFrame(frame);draw();
+}
+function draw(){
+ if(!running)return;
+ ctx.clearRect(0,0,360,480);
+ ctx.fillStyle="#a98bff";
+ ctx.fillRect(player-15,420,30,30);
+ if(Math.random()<0.025)rocks.push({x:Math.random()*330,y:-20});
+ ctx.fillStyle="#ff6b8a";
+ for(const r of rocks){
+  r.y+=3;
+  ctx.beginPath();ctx.arc(r.x,r.y,13,0,Math.PI*2);ctx.fill();
+  if(r.y>405&&r.y<455&&Math.abs(r.x-player)<27){
+   running=false;
+   ctx.fillStyle="white";ctx.font="28px Arial";
+   ctx.fillText("GAME OVER",95,230);
+   return;
+  }
+ }
+ rocks=rocks.filter(r=>r.y<500);
+ score++;
+ document.getElementById("score").textContent="Очки: "+score;
+ frame=requestAnimationFrame(draw);
+}
+function move(e){
+ const rect=c.getBoundingClientRect();
+ player=Math.max(15,Math.min(345,(e.clientX-rect.left)*360/rect.width));
+}
+c.addEventListener("mousemove",move);
+c.addEventListener("touchmove",e=>{
+ e.preventDefault();move(e.touches[0]);
+},{passive:false});
+start();
+</script>
+</body>
+</html>
